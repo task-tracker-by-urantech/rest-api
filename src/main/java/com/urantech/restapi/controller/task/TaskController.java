@@ -1,8 +1,6 @@
 package com.urantech.restapi.controller.task;
 
-import com.urantech.restapi.model.rest.task.TaskDto;
-import com.urantech.restapi.model.rest.task.TaskPayloadRequest;
-import com.urantech.restapi.model.rest.task.TaskUpdateRequest;
+import com.urantech.restapi.rest.task.TaskDto;
 import com.urantech.restapi.service.task.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +14,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public TaskDto create(@RequestBody TaskPayloadRequest req) {
-        return taskService.create(req);
+    public TaskDto create(@RequestBody TaskDto taskDto) {
+        return taskService.create(taskDto);
     }
 
     @GetMapping
@@ -26,8 +24,8 @@ public class TaskController {
     }
 
     @PatchMapping
-    public TaskDto update(@RequestBody TaskUpdateRequest req) {
-        return taskService.update(req);
+    public TaskDto update(@RequestBody TaskDto taskDto) {
+        return taskService.update(taskDto);
     }
 
     @DeleteMapping("/{id}")

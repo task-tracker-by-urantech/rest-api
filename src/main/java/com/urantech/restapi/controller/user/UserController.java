@@ -1,13 +1,11 @@
 package com.urantech.restapi.controller.user;
 
-import com.urantech.restapi.model.rest.user.RegistrationRequest;
+import com.urantech.restapi.entity.user.User;
+import com.urantech.restapi.rest.user.RegistrationRequest;
+import com.urantech.restapi.rest.user.UserResponse;
 import com.urantech.restapi.service.user.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +14,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public void register(@RequestBody @Valid RegistrationRequest req) {
+    public void register(@RequestBody RegistrationRequest req) {
         userService.register(req);
+    }
+
+    @GetMapping("/user")
+    public UserResponse getUser() {
+        User user = userService.getCurrentUser();
+        return new UserResponse(user.getEmail());
     }
 }

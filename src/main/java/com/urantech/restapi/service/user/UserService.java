@@ -1,27 +1,59 @@
 package com.urantech.restapi.service.user;
 
+import com.urantech.restapi.entity.user.User;
+import com.urantech.restapi.entity.user.UserAuthority;
 import com.urantech.restapi.exception.EmailExistsException;
-import com.urantech.restapi.model.entity.User;
-import com.urantech.restapi.model.rest.user.RegistrationRequest;
+import com.urantech.restapi.repository.user.UserAuthorityRepository;
 import com.urantech.restapi.repository.user.UserRepository;
+import com.urantech.restapi.rest.user.RegistrationRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final UserAuthorityRepository userAuthorityRepo;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (User) auth.getPrincipal();
+    }
 
     public void register(RegistrationRequest req) {
-        User user = new User(req.email(), req.password());
-//                passwordEncoder.encode(req.password())
-        try {
-            userRepository.save(user);
-        } catch (DuplicateKeyException e) {
-            throw new EmailExistsException("User with email %s already exists".formatted(req.email()));
+        String email = req.email();
+
+        Optional<User> userOpt = userRepo.findByEmail(email);
+        if (userOpt.isPresent()) {
+            String msg = "Email %s already exists".formatted(email);
+            throw new EmailExistsException(msg);
         }
-//        sendNotification(req.email());
+
+        User user = new User(
+                email,
+                passwordEncoder.encode(req.password())
+        );
+        UserAuthority authority = new UserAuthority(UserAuthority.Authority.USER, user);
+        user.setAuthorities(Set.of(authority));
+
+        userRepo.save(user);
+        userAuthorityRepo.save(authority);
+        sendNotification(user.getEmail());
+    }
+
+    private void sendNotification(String email) {
+        kafkaTemplate.send("EMAIL_SENDING", email);
+        log.info("Message sent to kafka");
     }
 }

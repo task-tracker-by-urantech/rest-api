@@ -1,12 +1,12 @@
-package com.urantech.restapi.model.rest.task;
+package com.urantech.restapi.rest.task;
 
-import com.urantech.restapi.model.entity.Task;
+import com.urantech.restapi.entity.task.Task;
 
 public record TaskDto(
-        long id,
+        Long id,
         String description,
-        boolean done
-) {
+        Boolean done) {
+
     public static TaskDto fromEntity(Task task) {
         return new TaskDto(
                 task.getId(),
