@@ -15,18 +15,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
-    private final UserService userService;
     private final TaskRepository taskRepo;
 
-    public TaskDto create(TaskDto taskDto) {
-        User user = userService.getCurrentUser();
+    public TaskDto create(TaskDto taskDto, User user) {
         Task task = new Task(taskDto.description(), user);
         Task entity = taskRepo.save(task);
         return TaskDto.fromEntity(entity);
     }
 
-    public List<TaskDto> getTasks() {
-        User user = userService.getCurrentUser();
+    public List<TaskDto> getTasks(User user) {
         return taskRepo.findAllByUserId(user.getId()).stream()
                 .map(TaskDto::fromEntity)
                 .toList();
