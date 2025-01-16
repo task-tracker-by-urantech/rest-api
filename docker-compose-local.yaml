@@ -1,0 +1,16 @@
+services:
+  task-tracker-db:
+    image: postgres
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass!
+      PGDATA: /data/postgres
+    volumes:
+      - db-data:/data/postgres
+    ports:
+      - "15432:5432"
+
+volumes:
+  db-data:
