@@ -40,6 +40,10 @@ public class User implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private Set<UserAuthority> authorities = new HashSet<>();
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
     @Override
     public String getUsername() {
         return email;
@@ -86,5 +90,10 @@ public class User implements UserDetails {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public enum UserStatus {
+        ACTIVE,
+        PENDING
     }
 }

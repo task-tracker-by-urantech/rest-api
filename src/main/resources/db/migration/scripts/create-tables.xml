@@ -65,4 +65,27 @@
         </sql>
         <comment>add constraints</comment>
     </changeSet>
+
+    <changeSet id="create-tables.4" author="urantech" runOnChange="false">
+        <sql>
+            <![CDATA[
+            CREATE TABLE IF NOT EXISTS outbox_event
+            (
+                id
+                BIGSERIAL
+                PRIMARY
+                KEY,
+                aggregate_id
+                BIGSERIAL,
+                event_type
+                VARCHAR,
+                payload
+                VARCHAR,
+                status
+                VARCHAR
+            );
+            ]]>
+        </sql>
+        <comment>create table outbox_event</comment>
+    </changeSet>
 </databaseChangeLog>
