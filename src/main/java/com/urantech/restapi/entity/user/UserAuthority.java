@@ -2,14 +2,13 @@ package com.urantech.restapi.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -41,7 +40,9 @@ public class UserAuthority implements GrantedAuthority {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserAuthority that = (UserAuthority) o;
-        return Objects.equals(id, that.id) && authority == that.authority && Objects.equals(user, that.user);
+        return Objects.equals(id, that.id)
+                && authority == that.authority
+                && Objects.equals(user, that.user);
     }
 
     @Override

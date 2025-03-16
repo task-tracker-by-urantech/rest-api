@@ -1,9 +1,14 @@
 package com.urantech.restapi.controller;
 
+import static com.urantech.restapi.entity.user.UserAuthority.Authority.USER;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urantech.restapi.entity.user.User;
 import com.urantech.restapi.entity.user.UserAuthority;
 import com.urantech.restapi.rest.task.TaskDto;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,22 +27,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-
-import static com.urantech.restapi.entity.user.UserAuthority.Authority.USER;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 class TaskControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper mapper;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     private final User user = new User();
     private final UserAuthority authority = new UserAuthority();
@@ -49,18 +45,22 @@ class TaskControllerTest {
         setUpSecurityContext();
 
         jdbcTemplate.execute("truncate table users, user_authority, task restart identity cascade");
-        jdbcTemplate.execute("insert into users (id, email, password, enabled) " +
-                "values (12345, 'j.dewar@gmail.com', 'some pass', true)");
-        jdbcTemplate.execute("insert into task (id, description, user_id, done) " +
-                "values (12345, 'task1', 12345, false), (12346, 'task2', 12345, true)");
+        jdbcTemplate.execute(
+                "insert into users (id, email, password, enabled) "
+                        + "values (12345, 'j.dewar@gmail.com', 'some pass', true)");
+        jdbcTemplate.execute(
+                "insert into task (id, description, user_id, done) "
+                        + "values (12345, 'task1', 12345, false), (12346, 'task2', 12345, true)");
     }
 
     @Test
     void shouldGetCurrentUserTasks() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders
-                .get("/api/tasks")
-                .with(SecurityMockMvcRequestPostProcessors.securityContext(SecurityContextHolder.getContext()));
+        var requestBuilder =
+                MockMvcRequestBuilders.get("/api/tasks")
+                        .with(
+                                SecurityMockMvcRequestPostProcessors.securityContext(
+                                        SecurityContextHolder.getContext()));
 
         // when
         mockMvc.perform(requestBuilder)
@@ -71,18 +71,19 @@ class TaskControllerTest {
                         jsonPath("$[0].description").value("task1"),
                         jsonPath("$[0].done").value(false),
                         jsonPath("$[1].description").value("task2"),
-                        jsonPath("$[1].done").value(true)
-                );
+                        jsonPath("$[1].done").value(true));
     }
 
     @Test
     void shouldCreateNewTask() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/api/tasks")
-                .with(SecurityMockMvcRequestPostProcessors.securityContext(SecurityContextHolder.getContext()))
-                .content(mapper.writeValueAsString(taskDto))
-                .contentType(MediaType.APPLICATION_JSON);
+        var requestBuilder =
+                MockMvcRequestBuilders.post("/api/tasks")
+                        .with(
+                                SecurityMockMvcRequestPostProcessors.securityContext(
+                                        SecurityContextHolder.getContext()))
+                        .content(mapper.writeValueAsString(taskDto))
+                        .contentType(MediaType.APPLICATION_JSON);
 
         // when
         mockMvc.perform(requestBuilder)
@@ -91,19 +92,20 @@ class TaskControllerTest {
                         status().isOk(),
                         jsonPath("$.length()").value(3),
                         jsonPath("$.description").value("task"),
-                        jsonPath("$.done").value(false)
-                );
+                        jsonPath("$.done").value(false));
     }
 
     @Test
     void shouldUpdateTask() throws Exception {
         // given
         TaskDto toUpdate = new TaskDto(12345L, "updated", true);
-        var requestBuilder = MockMvcRequestBuilders
-                .patch("/api/tasks")
-                .with(SecurityMockMvcRequestPostProcessors.securityContext(SecurityContextHolder.getContext()))
-                .content(mapper.writeValueAsString(toUpdate))
-                .contentType(MediaType.APPLICATION_JSON);
+        var requestBuilder =
+                MockMvcRequestBuilders.patch("/api/tasks")
+                        .with(
+                                SecurityMockMvcRequestPostProcessors.securityContext(
+                                        SecurityContextHolder.getContext()))
+                        .content(mapper.writeValueAsString(toUpdate))
+                        .contentType(MediaType.APPLICATION_JSON);
 
         // when
         mockMvc.perform(requestBuilder)
@@ -112,32 +114,34 @@ class TaskControllerTest {
                         status().isOk(),
                         jsonPath("$.length()").value(3),
                         jsonPath("$.description").value("updated"),
-                        jsonPath("$.done").value(true)
-                );
+                        jsonPath("$.done").value(true));
     }
 
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void shouldDeleteTask() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders
-                .delete("/api/tasks/{id}", 12345)
-                .with(SecurityMockMvcRequestPostProcessors.securityContext(SecurityContextHolder.getContext()));
+        var requestBuilder =
+                MockMvcRequestBuilders.delete("/api/tasks/{id}", 12345)
+                        .with(
+                                SecurityMockMvcRequestPostProcessors.securityContext(
+                                        SecurityContextHolder.getContext()));
 
         // when
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
+        mockMvc.perform(requestBuilder).andExpect(status().isOk());
 
         // then
-        Integer actual = jdbcTemplate.queryForObject("select count(*) from task where id = 12345", Integer.class);
+        Integer actual =
+                jdbcTemplate.queryForObject(
+                        "select count(*) from task where id = 12345", Integer.class);
         Assertions.assertEquals(0, actual);
     }
 
     private void setUpSecurityContext() {
         user.setId(12345L);
         user.setEmail("j.dewar@gmail.com");
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                user, null, Set.of(authority));
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(user, null, Set.of(authority));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }

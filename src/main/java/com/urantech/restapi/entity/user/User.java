@@ -3,16 +3,15 @@ package com.urantech.restapi.entity.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.urantech.restapi.entity.task.Task;
 import jakarta.persistence.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter

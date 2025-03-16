@@ -5,12 +5,10 @@ import com.urantech.restapi.entity.user.User;
 import com.urantech.restapi.exception.TaskNotFoundException;
 import com.urantech.restapi.repository.task.TaskRepository;
 import com.urantech.restapi.rest.task.TaskDto;
-import com.urantech.restapi.service.user.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +22,7 @@ public class TaskService {
     }
 
     public List<TaskDto> getTasks(User user) {
-        return taskRepo.findAllByUserId(user.getId()).stream()
-                .map(TaskDto::fromEntity)
-                .toList();
+        return taskRepo.findAllByUserId(user.getId()).stream().map(TaskDto::fromEntity).toList();
     }
 
     public TaskDto update(TaskDto taskDto) {

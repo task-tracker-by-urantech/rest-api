@@ -1,8 +1,15 @@
 package com.urantech.restapi.controller;
 
+import static com.urantech.restapi.entity.user.UserAuthority.Authority.USER;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urantech.restapi.entity.user.UserAuthority;
 import com.urantech.restapi.rest.user.RegistrationRequest;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,27 +25,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.concurrent.CompletableFuture;
-
-import static com.urantech.restapi.entity.user.UserAuthority.Authority.USER;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @MockBean
-    private KafkaTemplate<String, String> kafkaTemplate;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper mapper;
+    @Autowired private JdbcTemplate jdbcTemplate;
+    @MockBean private KafkaTemplate<String, String> kafkaTemplate;
 
     private final UserAuthority authority = new UserAuthority();
     private final RegistrationRequest req = new RegistrationRequest("test@email.com", "testPass");
@@ -49,18 +44,17 @@ class UserControllerTest {
 
         jdbcTemplate.execute("truncate table users, user_authority, task restart identity cascade");
 
-        when(kafkaTemplate.send(anyString(), anyString()))
-                .thenReturn(new CompletableFuture<>());
+        when(kafkaTemplate.send(anyString(), anyString())).thenReturn(new CompletableFuture<>());
     }
 
     @Test
     void shouldRegisterUser() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/api/users/register")
-                .with(user("j.dewar").authorities(authority))
-                .content(mapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON);
+        var requestBuilder =
+                MockMvcRequestBuilders.post("/api/users/register")
+                        .with(user("j.dewar").authorities(authority))
+                        .content(mapper.writeValueAsString(req))
+                        .contentType(MediaType.APPLICATION_JSON);
 
         // when
         mockMvc.perform(requestBuilder)
@@ -71,13 +65,14 @@ class UserControllerTest {
     @Test
     void givenDuplicateUser_whenRegisterUser_thenReturnConflict() throws Exception {
         // given
-        jdbcTemplate.execute("insert into users (id, email, password, enabled) " +
-                "values (12345, 'test@email.com', 'testPass', true)");
-        var requestBuilder = MockMvcRequestBuilders
-                .post("/api/users/register")
-                .with(user("j.dewar").authorities(authority))
-                .content(mapper.writeValueAsString(req))
-                .contentType(MediaType.APPLICATION_JSON);
+        jdbcTemplate.execute(
+                "insert into users (id, email, password, enabled) "
+                        + "values (12345, 'test@email.com', 'testPass', true)");
+        var requestBuilder =
+                MockMvcRequestBuilders.post("/api/users/register")
+                        .with(user("j.dewar").authorities(authority))
+                        .content(mapper.writeValueAsString(req))
+                        .contentType(MediaType.APPLICATION_JSON);
 
         // when
         mockMvc.perform(requestBuilder)

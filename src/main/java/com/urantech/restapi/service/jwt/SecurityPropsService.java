@@ -1,10 +1,9 @@
 package com.urantech.restapi.service.jwt;
 
 import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 
 @Service
 public class SecurityPropsService {

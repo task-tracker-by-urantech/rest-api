@@ -3,11 +3,10 @@ package com.urantech.restapi.controller.task;
 import com.urantech.restapi.entity.user.User;
 import com.urantech.restapi.rest.task.TaskDto;
 import com.urantech.restapi.service.task.TaskService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +15,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public TaskDto create(@RequestBody TaskDto taskDto,
-                          @AuthenticationPrincipal User user) {
+    public TaskDto create(@RequestBody TaskDto taskDto, @AuthenticationPrincipal User user) {
         return taskService.create(taskDto, user);
     }
 

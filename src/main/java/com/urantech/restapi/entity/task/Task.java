@@ -2,14 +2,13 @@ package com.urantech.restapi.entity.task;
 
 import com.urantech.restapi.entity.user.User;
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-
-import java.util.Objects;
 
 @Entity
 @Getter
