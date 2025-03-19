@@ -71,18 +71,11 @@
             <![CDATA[
             CREATE TABLE IF NOT EXISTS outbox_event
             (
-                id
-                BIGSERIAL
-                PRIMARY
-                KEY,
-                aggregate_id
-                BIGSERIAL,
-                event_type
-                VARCHAR,
-                payload
-                VARCHAR,
-                status
-                VARCHAR
+                id BIGSERIAL PRIMARY KEY,
+                aggregate_id BIGSERIAL,
+                event_type VARCHAR,
+                payload VARCHAR,
+                status VARCHAR
             );
             ]]>
         </sql>
