@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urantech.restapi.entity.user.User;
 import com.urantech.restapi.entity.user.UserAuthority;
 import com.urantech.restapi.rest.task.TaskDto;
+
 import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 class TaskControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper mapper;
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper mapper;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private final User user = new User();
     private final UserAuthority authority = new UserAuthority();

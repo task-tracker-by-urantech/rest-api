@@ -2,6 +2,7 @@ package com.urantech.restapi.saga;
 
 import static com.urantech.restapi.entity.outbox.OutboxEvent.OutboxEventStatus.*;
 
+import com.urantech.restapi.entity.outbox.OutboxEvent;
 import com.urantech.restapi.repository.outbox.OutboxEventRepository;
 import com.urantech.restapi.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -22,22 +25,20 @@ public class UserRegistrationOrchestrator {
     @Transactional
     @Scheduled(fixedDelay = 5000)
     public void processOutbox() {
-        outboxEventRepo
-                .findByStatus(PENDING)
-                .forEach(
-                        event -> {
-                            try {
-                                kafkaTemplate.send("USER_REGISTRATION", event.getPayload()).get();
-                                event.setStatus(SENT);
-                                outboxEventRepo.save(event);
-                                userService.confirmRegistration(event.getAggregateId());
-                                log.info("Message sent to kafka");
-                            } catch (Exception e) {
-                                log.error("Failed to send event {}", event.getId(), e);
-                                userService.compensateRegistration(event.getAggregateId());
-                                event.setStatus(FAILED);
-                                outboxEventRepo.save(event);
-                            }
-                        });
+        final List<OutboxEvent> events = outboxEventRepo.findByStatus(PENDING);
+        for (OutboxEvent event : events) {
+            try {
+                kafkaTemplate.send("USER_REGISTRATION", event.getPayload()).get();
+                event.setStatus(SENT);
+                outboxEventRepo.save(event);
+                userService.confirmRegistration(event.getAggregateId());
+                log.info("Message sent to kafka");
+            } catch (Exception e) {
+                log.error("Failed to send event {}", event.getId(), e);
+                userService.compensateRegistration(event.getAggregateId());
+                event.setStatus(FAILED);
+                outboxEventRepo.save(event);
+            }
+        }
     }
 }

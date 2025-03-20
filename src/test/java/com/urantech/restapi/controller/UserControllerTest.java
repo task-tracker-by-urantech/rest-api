@@ -9,7 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urantech.restapi.entity.user.UserAuthority;
 import com.urantech.restapi.rest.user.RegistrationRequest;
+
 import java.util.concurrent.CompletableFuture;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,10 +32,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper mapper;
-    @Autowired private JdbcTemplate jdbcTemplate;
-    @MockBean private KafkaTemplate<String, String> kafkaTemplate;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper mapper;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @MockBean
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     private final UserAuthority authority = new UserAuthority();
     private final RegistrationRequest req = new RegistrationRequest("test@email.com", "testPass");

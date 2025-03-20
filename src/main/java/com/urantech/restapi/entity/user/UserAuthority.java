@@ -38,16 +38,13 @@ public class UserAuthority implements GrantedAuthority {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserAuthority that = (UserAuthority) o;
-        return Objects.equals(id, that.id)
-                && authority == that.authority
-                && Objects.equals(user, that.user);
+        if (!(o instanceof UserAuthority that)) return false;
+        return Objects.equals(id, that.id) && authority == that.authority;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, authority, user);
+        return Objects.hash(id, authority);
     }
 
     public UserAuthority(Authority authority, User user) {

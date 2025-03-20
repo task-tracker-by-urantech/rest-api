@@ -8,8 +8,10 @@ import com.urantech.restapi.repository.outbox.OutboxEventRepository;
 import com.urantech.restapi.repository.user.UserAuthorityRepository;
 import com.urantech.restapi.repository.user.UserRepository;
 import com.urantech.restapi.rest.user.RegistrationRequest;
+
 import java.util.Optional;
 import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,11 +33,10 @@ public class UserService {
 
     public void confirmRegistration(long userId) {
         userRepo.findById(userId)
-                .ifPresent(
-                        user -> {
-                            user.setStatus(User.UserStatus.ACTIVE);
-                            log.info("User {} activated", userId);
-                        });
+                .ifPresent(user -> {
+                    user.setStatus(User.UserStatus.ACTIVE);
+                    log.info("User {} activated", userId);
+                });
     }
 
     public void compensateRegistration(long userId) {
@@ -46,8 +47,7 @@ public class UserService {
     private User createAndPersistUser(RegistrationRequest req) {
         final Optional<User> userOpt = userRepo.findByEmail(req.email());
         if (userOpt.isPresent()) {
-            throw new EmailExistsException(
-                    "User with email %s already exists".formatted(req.email()));
+            throw new EmailExistsException("User with email %s already exists".formatted(req.email()));
         }
 
         final User user = new User(req.email(), passwordEncoder.encode(req.password()));
@@ -61,13 +61,12 @@ public class UserService {
     }
 
     private void saveEvent(long aggregateId, String payload) {
-        final OutboxEvent event =
-                OutboxEvent.builder()
-                        .aggregateId(aggregateId)
-                        .eventType("USER_REGISTERED")
-                        .payload(payload)
-                        .status(OutboxEvent.OutboxEventStatus.PENDING)
-                        .build();
+        final OutboxEvent event = OutboxEvent.builder()
+                .aggregateId(aggregateId)
+                .eventType("USER_REGISTERED")
+                .payload(payload)
+                .status(OutboxEvent.OutboxEventStatus.PENDING)
+                .build();
         outboxEventRepo.save(event);
     }
 }
