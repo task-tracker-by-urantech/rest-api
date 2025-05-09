@@ -50,11 +50,9 @@ class TaskControllerTest {
         setUpSecurityContext();
 
         jdbcTemplate.execute("truncate table users, user_authority, task restart identity cascade");
-        jdbcTemplate.execute(
-                "insert into users (id, email, password, enabled) "
+        jdbcTemplate.execute("insert into users (id, email, password, enabled) "
                         + "values (12345, 'j.dewar@gmail.com', 'some pass', true)");
-        jdbcTemplate.execute(
-                "insert into task (id, description, user_id, done) "
+        jdbcTemplate.execute("insert into task (id, description, user_id, done) "
                         + "values (12345, 'task1', 12345, false), (12346, 'task2', 12345, true)");
     }
 

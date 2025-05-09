@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
@@ -36,15 +37,22 @@ public class UserAuthority implements GrantedAuthority {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserAuthority that)) return false;
-        return Objects.equals(id, that.id) && authority == that.authority;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        UserAuthority that = (UserAuthority) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, authority);
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
     public UserAuthority(Authority authority, User user) {

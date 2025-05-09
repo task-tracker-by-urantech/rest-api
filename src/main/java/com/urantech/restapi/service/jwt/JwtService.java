@@ -2,6 +2,7 @@ package com.urantech.restapi.service.jwt;
 
 import java.time.Duration;
 import java.time.Instant;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,15 +23,13 @@ public class JwtService {
         String email = auth.getName();
         Instant now = Instant.now();
 
-        JwtClaimsSet claims =
-                JwtClaimsSet.builder()
-                        .claim(
-                                "authorities",
-                                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority))
-                        .issuedAt(now)
-                        .expiresAt(now.plus(Duration.ofDays(1)))
-                        .subject(email)
-                        .build();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .claim("authorities",
+                        auth.getAuthorities().stream().map(GrantedAuthority::getAuthority))
+                .issuedAt(now)
+                .expiresAt(now.plus(Duration.ofDays(1)))
+                .subject(email)
+                .build();
 
         JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();

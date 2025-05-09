@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Getter
@@ -41,16 +42,22 @@ public class User {
     private UserStatus status;
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         User user = (User) o;
-        return Objects.equals(email, user.email) && Objects.equals(password, user.password);
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(email, password);
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
     public User(String email, String password) {

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
@@ -31,15 +32,22 @@ public class Task {
     private User user;
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Task task)) return false;
-        return done == task.done && Objects.equals(id, task.id) && Objects.equals(description, task.description);
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Task task = (Task) o;
+        return getId() != null && Objects.equals(getId(), task.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, description, done);
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ?
+                proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
     public Task(String description, User user) {

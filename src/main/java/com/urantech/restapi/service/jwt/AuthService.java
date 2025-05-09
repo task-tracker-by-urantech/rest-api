@@ -16,9 +16,7 @@ public class AuthService {
 
     public AuthResponse authenticate(AuthRequest req) {
         String email = req.email().trim().toLowerCase();
-        Authentication auth =
-                authManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(email, req.password()));
+        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(email, req.password()));
         String token = jwtService.generateToken(auth);
         return new AuthResponse(token);
     }

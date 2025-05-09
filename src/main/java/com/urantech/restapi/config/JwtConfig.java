@@ -17,15 +17,13 @@ public class JwtConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        JWKSource<SecurityContext> secret =
-                new ImmutableSecret<>(securityPropsService.getSecretKey());
+        JWKSource<SecurityContext> secret = new ImmutableSecret<>(securityPropsService.getSecretKey());
         return new NimbusJwtEncoder(secret);
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        final NimbusJwtDecoder decoder =
-                NimbusJwtDecoder.withSecretKey(securityPropsService.getSecretKey()).build();
+        final NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(securityPropsService.getSecretKey()).build();
         JwtTimestampValidator timestampValidator = new JwtTimestampValidator();
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(timestampValidator));
         return decoder;
