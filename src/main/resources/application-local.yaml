@@ -8,8 +8,8 @@ spring:
     name: rest-api
   datasource:
     url: jdbc:postgresql://localhost:15432/postgres
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    username: postgres
+    password: pass!
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -28,7 +28,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 jwt:
-  secret-key: ${JWT_SECRET}
+  secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
 eureka:
   client:
     service-url:
